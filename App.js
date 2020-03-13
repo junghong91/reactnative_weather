@@ -11,21 +11,29 @@ export default class extends React.Component {
   state = {
     isLoading: true
   };
+
   getWeather = async (latitude, longitude) => {
     const {
       data: {
-        main: { temp },
+        name,
+        main: { temp, temp_max, temp_min },
         weather
       }
     } = await axios.get(
       `http://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&appid=${API_KEY}&units=metric`
     );
+
     this.setState({
       isLoading: false,
+      name,
+      temp_max,
+      temp_min,
       temp,
-      condition: weather[0].main
+      condition: weather[0].main,
+      description: weather[0].description
     });
   };
+
   getLocation = async () => {
     try {
       await Location.requestPermissionsAsync();
@@ -41,11 +49,26 @@ export default class extends React.Component {
     this.getLocation();
   }
   render() {
-    const { isLoading, temp, condition } = this.state;
+    const {
+      isLoading,
+      temp,
+      condition,
+      name,
+      temp_max,
+      temp_min,
+      description
+    } = this.state;
     return isLoading ? (
       <Loading />
     ) : (
-      <Weather temp={Math.round(temp)} condition={condition} />
+      <Weather
+        temp={Math.round(temp)}
+        condition={condition}
+        name={name}
+        temp_max={temp_max}
+        temp_min={temp_min}
+        description={description}
+      />
     );
   }
 }
